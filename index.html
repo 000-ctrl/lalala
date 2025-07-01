@@ -145,6 +145,7 @@
             font-size: 1.4rem;
             font-weight: bold;
             margin: 5px 0;
+            min-width: 50px; /* 确保宽度足够 */
         }
 
         .stat-name {
@@ -445,7 +446,7 @@
         </div>
         
         <footer>
-            <p>Pixel Cat &copy; 2023 | 一个纯前端的虚拟宠物游戏</p>
+            <p>Pixel Cat &copy; 2025 | 一个纯前端的虚拟宠物游戏</p>
         </footer>
     </div>
 
@@ -481,10 +482,11 @@
         
         // 更新状态显示
         function updateDisplay() {
-            hungerValue.textContent = `${state.hunger}%`;
-            happinessValue.textContent = `${state.happiness}%`;
-            energyValue.textContent = `${state.energy}%`;
-            cleanlinessValue.textContent = `${state.cleanliness}%`;
+            // 修复：使用Math.round四舍五入到整数
+            hungerValue.textContent = `${Math.round(state.hunger)}%`;
+            happinessValue.textContent = `${Math.round(state.happiness)}%`;
+            energyValue.textContent = `${Math.round(state.energy)}%`;
+            cleanlinessValue.textContent = `${Math.round(state.cleanliness)}%`;
             
             hungerBar.style.width = `${state.hunger}%`;
             happinessBar.style.width = `${state.happiness}%`;
