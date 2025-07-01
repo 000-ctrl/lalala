@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pixel Cat - 虚拟宠物猫</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            background: rgba(0, 0, 30, 0.7);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            width: 95%;
+            max-width: 900px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        header {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #ff9a9e, #fad0c4, #fad0c4, #a1c4fd);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            animation: gradient 3s ease infinite;
+            background-size: 300% 300%;
+        }
+
+        @keyframes gradient {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.8;
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .pet-area {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(0, 10, 30, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .pet-display {
+            background: rgba(0, 20, 40, 0.5);
+            border-radius: 15px;
+            height: 300px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(100, 200, 255, 0.3);
+        }
+
+        .pet {
+            position: relative;
+            width: 200px;
+            height: 200px;
+            transition: transform 0.3s ease;
+        }
+
+        .pet:hover {
+            transform: scale(1.05);
+        }
+
+        .pet img {
+            width: 100%;
+            height: auto;
+            image-rendering: pixelated;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            background: rgba(0, 30, 60, 0.6);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: transform 0.3s ease;
+        }
+
+        .stat:hover {
+            transform: translateY(-5px);
+            background: rgba(0, 60, 120, 0.7);
+        }
+
+        .stat i {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: bold;
+            margin: 5px 0;
+        }
+
+        .stat-name {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .progress {
+            height: 100%;
+            border-radius: 5px;
+            transition: width 0.5s ease;
+        }
+
+        .hunger .progress { background: linear-gradient(to right, #ff9a9e, #fad0c4); }
+        .happiness .progress { background: linear-gradient(to right, #a1c4fd, #c2e9fb); }
+        .energy .progress { background: linear-gradient(to right, #84fab0, #8fd3f4); }
+        .cleanliness .progress { background: linear-gradient(to right, #d4fc79, #96e6a1); }
+
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            padding: 14px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn.feed {
+            background: linear-gradient(45deg, #4facfe, #00f2fe);
+        }
+
+        .btn.play {
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+        }
+
+        .btn.clean {
+            background: linear-gradient(45deg, #43e97b, #38f9d7);
+        }
+
+        .btn.sleep {
+            background: linear-gradient(45deg, #a18cd1, #fbc2eb);
+        }
+
+        .history {
+            flex: 1;
+            min-width: 300px;
+            background: rgba(0, 10, 30, 0.6);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+        }
+
+        .history h2 {
+            margin-bottom: 20px;
+            font-size: 1.8rem;
+            color: #a1c4fd;
+        }
+
+        .log-container {
+            background: rgba(0, 20, 40, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            height: 350px;
+            overflow-y: auto;
+            text-align: left;
+            border: 2px solid rgba(100, 200, 255, 0.3);
+        }
+
+        .log-entry {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            animation: fadeIn 0.5s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .log-entry i {
+            font-size: 1.2rem;
+        }
+
+        .feed-log { border-left: 4px solid #4facfe; }
+        .play-log { border-left: 4px solid #f093fb; }
+        .clean-log { border-left: 4px solid #43e97b; }
+        .sleep-log { border-left: 4px solid #a18cd1; }
+        .auto-log { border-left: 4px solid #ffd166; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            color: #333;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            animation: float 2s ease forwards;
+            z-index: 100;
+        }
+
+        @keyframes float {
+            0% { top: 20px; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { top: -50px; opacity: 0; }
+        }
+
+        .particle {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background-size: contain;
+            background-repeat: no-repeat;
+            z-index: 50;
+            animation: particleMove 1s ease-out forwards;
+        }
+
+        @keyframes particleMove {
+            to {
+                transform: translate(var(--tx), var(--ty)) rotate(var(--r));
+                opacity: 0;
+            }
+        }
+
+        .instructions {
+            margin-top: 25px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 15px;
+            font-size: 0.9rem;
+            text-align: left;
+        }
+
+        .instructions h3 {
+            margin-bottom: 10px;
+            color: #ffd166;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+        }
+
+        footer {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            .main-content {
+                flex-direction: column;
+            }
+            
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .actions {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-cat"></i> Pixel Cat</h1>
+            <p class="subtitle">照顾好你的虚拟像素宠物猫！保持它的状态良好！</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="pet-area">
+                <div class="pet-display">
+                    <div class="pet">
+                        <img id="cat-image" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Crect width='200' height='200' fill='%233a0ca3'/%3E%3Ccircle cx='70' cy='70' r='20' fill='%23f72585'/%3E%3Ccircle cx='130' cy='70' r='20' fill='%23f72585'/%3E%3Ccircle cx='65' cy='65' r='8' fill='white'/%3E%3Ccircle cx='125' cy='65' r='8' fill='white'/%3E%3Ccircle cx='63' cy='63' r='3' fill='black'/%3E%3Ccircle cx='123' cy='63' r='3' fill='black'/%3E%3Cpath d='M90 100 Q100 130, 110 100' stroke='%23f72585' stroke-width='5' fill='none'/%3E%3Cpath d='M40 80 Q100 100, 160 80' stroke='%23f72585' stroke-width='8' fill='none'/%3E%3Cpath d='M60 150 L80 170 L100 150 L120 170 L140 150' stroke='%234cc9f0' stroke-width='8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" alt="Pixel Cat">
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat hunger">
+                        <i class="fas fa-hamburger"></i>
+                        <div class="stat-value" id="hunger-value">80%</div>
+                        <div class="stat-name">饥饿度</div>
+                        <div class="progress-bar">
+                            <div class="progress" id="hunger-bar" style="width: 80%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat happiness">
+                        <i class="fas fa-laugh-beam"></i>
+                        <div class="stat-value" id="happiness-value">75%</div>
+                        <div class="stat-name">快乐度</div>
+                        <div class="progress-bar">
+                            <div class="progress" id="happiness-bar" style="width: 75%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat energy">
+                        <i class="fas fa-bolt"></i>
+                        <div class="stat-value" id="energy-value">65%</div>
+                        <div class="stat-name">能量值</div>
+                        <div class="progress-bar">
+                            <div class="progress" id="energy-bar" style="width: 65%;"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat cleanliness">
+                        <i class="fas fa-shower"></i>
+                        <div class="stat-value" id="cleanliness-value">90%</div>
+                        <div class="stat-name">清洁度</div>
+                        <div class="progress-bar">
+                            <div class="progress" id="cleanliness-bar" style="width: 90%;"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="actions">
+                    <button class="btn feed" id="feed-btn">
+                        <i class="fas fa-utensils"></i> 喂食
+                    </button>
+                    <button class="btn play" id="play-btn">
+                        <i class="fas fa-gamepad"></i> 玩耍
+                    </button>
+                    <button class="btn clean" id="clean-btn">
+                        <i class="fas fa-shower"></i> 清洁
+                    </button>
+                    <button class="btn sleep" id="sleep-btn">
+                        <i class="fas fa-bed"></i> 睡觉
+                    </button>
+                </div>
+            </div>
+            
+            <div class="history">
+                <h2><i class="fas fa-history"></i> 活动日志</h2>
+                <div class="log-container" id="log-container">
+                    <div class="log-entry auto-log">
+                        <i class="fas fa-paw"></i> Pixel Cat 醒来了！好好照顾它吧！
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3><i class="fas fa-info-circle"></i> 游戏说明</h3>
+            <ul>
+                <li>喂食：增加饥饿度，但会略微降低清洁度</li>
+                <li>玩耍：增加快乐度，但会消耗能量</li>
+                <li>清洁：提高清洁度，但会降低快乐度</li>
+                <li>睡觉：恢复能量，但其他状态会缓慢下降</li>
+                <li>所有状态会随时间自然下降，保持平衡是关键！</li>
+            </ul>
+        </div>
+        
+        <footer>
+            <p>Pixel Cat &copy; 2023 | 一个纯前端的虚拟宠物游戏</p>
+        </footer>
+    </div>
+
+    <script>
+        // 宠物状态
+        const state = {
+            hunger: 80,
+            happiness: 75,
+            energy: 65,
+            cleanliness: 90,
+            isSleeping: false
+        };
+
+        // 状态元素
+        const hungerValue = document.getElementById('hunger-value');
+        const happinessValue = document.getElementById('happiness-value');
+        const energyValue = document.getElementById('energy-value');
+        const cleanlinessValue = document.getElementById('cleanliness-value');
+        
+        const hungerBar = document.getElementById('hunger-bar');
+        const happinessBar = document.getElementById('happiness-bar');
+        const energyBar = document.getElementById('energy-bar');
+        const cleanlinessBar = document.getElementById('cleanliness-bar');
+        
+        // 按钮
+        const feedBtn = document.getElementById('feed-btn');
+        const playBtn = document.getElementById('play-btn');
+        const cleanBtn = document.getElementById('clean-btn');
+        const sleepBtn = document.getElementById('sleep-btn');
+        
+        // 日志容器
+        const logContainer = document.getElementById('log-container');
+        
+        // 更新状态显示
+        function updateDisplay() {
+            hungerValue.textContent = `${state.hunger}%`;
+            happinessValue.textContent = `${state.happiness}%`;
+            energyValue.textContent = `${state.energy}%`;
+            cleanlinessValue.textContent = `${state.cleanliness}%`;
+            
+            hungerBar.style.width = `${state.hunger}%`;
+            happinessBar.style.width = `${state.happiness}%`;
+            energyBar.style.width = `${state.energy}%`;
+            cleanlinessBar.style.width = `${state.cleanliness}%`;
+            
+            // 更新进度条颜色
+            updateBarColor(hungerBar, state.hunger);
+            updateBarColor(happinessBar, state.happiness);
+            updateBarColor(energyBar, state.energy);
+            updateBarColor(cleanlinessBar, state.cleanliness);
+        }
+        
+        // 根据数值更新进度条颜色
+        function updateBarColor(bar, value) {
+            if (value < 30) {
+                bar.style.background = 'linear-gradient(to right, #ff416c, #ff4b2b)';
+            } else if (value < 60) {
+                bar.style.background = 'linear-gradient(to right, #ffd166, #ff9a3c)';
+            }
+        }
+        
+        // 添加日志条目
+        function addLog(message, type) {
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}-log`;
+            logEntry.innerHTML = `<i class="fas ${getIcon(type)}"></i> ${getTimestamp()} ${message}`;
+            
+            logContainer.prepend(logEntry);
+            
+            // 限制日志数量
+            if (logContainer.children.length > 20) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+            
+            // 滚动到顶部
+            logContainer.scrollTop = 0;
+        }
+        
+        // 获取图标
+        function getIcon(type) {
+            const icons = {
+                'feed': 'fa-utensils',
+                'play': 'fa-gamepad',
+                'clean': 'fa-shower',
+                'sleep': 'fa-bed',
+                'auto': 'fa-paw'
+            };
+            return icons[type] || 'fa-info-circle';
+        }
+        
+        // 获取时间戳
+        function getTimestamp() {
+            const now = new Date();
+            return `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}]`;
+        }
+        
+        // 显示浮动消息
+        function showMessage(text) {
+            const message = document.createElement('div');
+            message.className = 'message';
+            message.textContent = text;
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                message.remove();
+            }, 2000);
+        }
+        
+        // 创建粒子效果
+        function createParticles(x, y, count, type) {
+            for (let i = 0; i < count; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                
+                // 设置粒子样式
+                if (type === 'food') {
+                    particle.style.backgroundImage = "url('data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\"%3E%3Ccircle cx=\"8\" cy=\"8\" r=\"5\" fill=\"%23FF9A8B\"/%3E%3C/svg%3E')";
+                } else if (type === 'bubbles') {
+                    particle.style.backgroundImage = "url('data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\"%3E%3Ccircle cx=\"8\" cy=\"8\" r=\"4\" fill=\"%2343E97B\" opacity=\"0.8\"/%3E%3C/svg%3E')";
+                } else {
+                    particle.style.backgroundImage = "url('data:image/svg+xml,%3Csvg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 16 16\"%3E%3Ccircle cx=\"8\" cy=\"8\" r=\"3\" fill=\"%23FFD166\"/%3E%3C/svg%3E')";
+                }
+                
+                // 随机粒子位置和运动
+                const angle = Math.random() * Math.PI * 2;
+                const distance = 50 + Math.random() * 100;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance - 50;
+                const rotation = Math.random() * 360;
+                
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+                particle.style.setProperty('--r', `${rotation}deg`);
+                
+                particle.style.left = `${x}px`;
+                particle.style.top = `${y}px`;
+                
+                document.body.appendChild(particle);
+                
+                // 移除粒子
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
+            }
+        }
+        
+        // 按钮事件
+        feedBtn.addEventListener('click', () => {
+            if (state.isSleeping) {
+                showMessage("猫咪正在睡觉，不要打扰它！");
+                return;
+            }
+            
+            state.hunger = Math.min(100, state.hunger + 20);
+            state.cleanliness = Math.max(0, state.cleanliness - 5);
+            
+            updateDisplay();
+            addLog("你给猫咪喂了食物。猫咪很满意！", "feed");
+            showMessage("🍖 猫咪吃得很开心！");
+            
+            // 粒子效果
+            const rect = feedBtn.getBoundingClientRect();
+            createParticles(rect.left + rect.width/2, rect.top + rect.height/2, 10, 'food');
+        });
+        
+        playBtn.addEventListener('click', () => {
+            if (state.isSleeping) {
+                showMessage("猫咪正在睡觉，不要打扰它！");
+                return;
+            }
+            
+            if (state.energy < 20) {
+                showMessage("猫咪太累了，无法玩耍！");
+                return;
+            }
+            
+            state.happiness = Math.min(100, state.happiness + 15);
+            state.energy = Math.max(0, state.energy - 10);
+            
+            updateDisplay();
+            addLog("你和猫咪一起玩耍。猫咪非常开心！", "play");
+            showMessage("🎾 玩得真开心！");
+        });
+        
+        cleanBtn.addEventListener('click', () => {
+            if (state.isSleeping) {
+                showMessage("猫咪正在睡觉，不要打扰它！");
+                return;
+            }
+            
+            state.cleanliness = Math.min(100, state.cleanliness + 20);
+            state.happiness = Math.max(0, state.happiness - 5);
+            
+            updateDisplay();
+            addLog("你给猫咪洗了个澡。猫咪变得干净了！", "clean");
+            showMessage("🛁 洗得真干净！");
+            
+            // 粒子效果
+            const rect = cleanBtn.getBoundingClientRect();
+            createParticles(rect.left + rect.width/2, rect.top + rect.height/2, 15, 'bubbles');
+        });
+        
+        sleepBtn.addEventListener('click', () => {
+            if (state.isSleeping) {
+                // 唤醒猫咪
+                state.isSleeping = false;
+                sleepBtn.innerHTML = '<i class="fas fa-bed"></i> 睡觉';
+                addLog("猫咪醒来了！", "auto");
+                showMessage("😺 猫咪醒来了！");
+            } else {
+                // 让猫咪睡觉
+                state.isSleeping = true;
+                sleepBtn.innerHTML = '<i class="fas fa-sun"></i> 唤醒';
+                addLog("猫咪去睡觉了。Zzz...", "sleep");
+                showMessage("😴 猫咪睡着了...");
+            }
+        });
+        
+        // 随时间自然变化状态
+        setInterval(() => {
+            if (state.isSleeping) {
+                // 睡觉时恢复能量，其他状态缓慢下降
+                state.energy = Math.min(100, state.energy + 2);
+                state.hunger = Math.max(0, state.hunger - 0.5);
+                state.happiness = Math.max(0, state.happiness - 0.3);
+                state.cleanliness = Math.max(0, state.cleanliness - 0.2);
+            } else {
+                // 醒着时所有状态缓慢下降
+                state.hunger = Math.max(0, state.hunger - 0.8);
+                state.happiness = Math.max(0, state.happiness - 0.7);
+                state.energy = Math.max(0, state.energy - 0.9);
+                state.cleanliness = Math.max(0, state.cleanliness - 0.5);
+            }
+            
+            // 检查状态过低
+            if (state.hunger < 20 && !state.isSleeping) {
+                addLog("猫咪饿得喵喵叫！快喂食！", "auto");
+            }
+            
+            if (state.happiness < 20 && !state.isSleeping) {
+                addLog("猫咪感到无聊，想玩耍！", "auto");
+            }
+            
+            if (state.energy < 10 && !state.isSleeping) {
+                addLog("猫咪太累了，需要休息！", "auto");
+            }
+            
+            updateDisplay();
+        }, 5000);
+        
+        // 初始化显示
+        updateDisplay();
+    </script>
+</body>
+</html>
